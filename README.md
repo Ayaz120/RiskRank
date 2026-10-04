@@ -108,37 +108,6 @@ Then open **http://127.0.0.1:5050** in your browser. The dashboard is
 read-only — it displays whatever is already in `triage.db`; run the
 CLI pipeline first to populate it.
 
-## Design notes worth knowing for interviews
-
-- **Model-agnostic engine design:** the LLM call is isolated in one
-  function (`triage_finding`), so swapping backends doesn't require
-  touching the rest of the pipeline.
-- **Hardware-driven model choice:** `llama3.2:3b` was chosen over the
-  larger `llama3.1:8b` after measuring real latency on CPU-only
-  hardware — a genuine trade-off between output quality and usability.
-- **Prompt engineering to prevent hallucinated precision:** early
-  testing showed the model sometimes invented fake numeric sub-scores
-  in its CVSS reasoning (e.g. "6/8", or an impossible "9/8"). The
-  system prompt was tightened to explicitly forbid this.
-- **Risk-based prioritization, not just severity sorting:** the
-  scoring algorithm deliberately weighs exploitability and asset
-  criticality alongside CVSS, because raw severity alone causes
-  "alert fatigue" — chasing high CVSS scores on assets nobody cares
-  about while ignoring medium-severity bugs on critical systems.
-- **XSS-safe output:** both the HTML report and the web dashboard
-  escape all finding text before rendering it (manually in the report
-  generator, automatically via Jinja2 autoescaping in the dashboard).
-  This matters because finding text could originate from untrusted
-  input (e.g. a malicious service banner) — a "security tool" that
-  reflected unescaped input into its own HTML would be an awkward
-  thing to explain in an interview.
-- **Public deployment trade-offs:** this is intentionally local-first.
-  A public, always-on, AI-computing endpoint for anonymous users is
-  a hosting/cost/abuse-prevention problem of its own, not a natural
-  extension of a portfolio project — worth being able to explain
-  *why* that boundary was drawn deliberately rather than treating it
-  as an unfinished feature.
-
 ## Project structure
 
 ```
