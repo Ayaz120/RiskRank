@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}Triage Dashboard{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --ink: #11161f;
+        --panel: #171e2b;
+        --panel-raised: #1c2432;
+        --line: #2a3344;
+        --text: #e7e9ee;
+        --muted: #8792a6;
+        --muted-dim: #5c6679;
+        --signal: #d9a05b;
+
+        --critical: #d6534f;
+        --high: #e08e45;
+        --medium: #4fa3a0;
+        --low: #7ea87a;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        background: var(--ink);
+        color: var(--text);
+        font-family: 'Source Serif 4', Georgia, serif;
+        line-height: 1.5;
+    }
+
+    .mono {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+    }
+
+    a { color: inherit; }
+
+    .shell {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 48px 24px 100px;
+    }
+
+    header.masthead {
+        border-bottom: 1px solid var(--line);
+        padding-bottom: 24px;
+        margin-bottom: 32px;
+    }
+
+    header.masthead .kicker {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem;
+        color: var(--signal);
+        letter-spacing: 0.04em;
+        margin-bottom: 10px;
+    }
+
+    header.masthead h1 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        margin: 0 0 8px;
+        letter-spacing: -0.01em;
+    }
+
+    header.masthead p.lede {
+        color: var(--muted);
+        font-size: 1rem;
+        max-width: 56ch;
+        margin: 0;
+    }
+
+    /* Ledger-style stat strip instead of generic rounded summary cards */
+    .ledger {
+        display: flex;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        margin: 28px 0 40px;
+    }
+    .ledger-item {
+        flex: 1;
+        padding: 14px 18px;
+        border-right: 1px solid var(--line);
+    }
+    .ledger-item:last-child { border-right: none; }
+    .ledger-item .n {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.5rem;
+        font-weight: 600;
+        line-height: 1;
+    }
+    .ledger-item .l {
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-top: 6px;
+    }
+    .ledger-item.critical .n { color: var(--critical); }
+    .ledger-item.high .n { color: var(--high); }
+    .ledger-item.medium .n { color: var(--medium); }
+    .ledger-item.low .n { color: var(--low); }
+
+    section.stream { display: flex; flex-direction: column; gap: 14px; }
+
+    .case {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--muted-dim);
+        border-radius: 4px;
+        padding: 20px 24px;
+    }
+    .case.critical { border-left-color: var(--critical); }
+    .case.high { border-left-color: var(--high); }
+    .case.medium { border-left-color: var(--medium); }
+    .case.low { border-left-color: var(--low); }
+
+    .case-top {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 4px;
+    }
+    .case-rank {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--muted-dim);
+        font-size: 0.85rem;
+        flex-shrink: 0;
+    }
+    .case-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin: 0;
+        flex: 1;
+    }
+    .case-severity {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 3px;
+        flex-shrink: 0;
+    }
+    .case-severity.critical { background: rgba(214,83,79,0.15); color: var(--critical); }
+    .case-severity.high { background: rgba(224,142,69,0.15); color: var(--high); }
+    .case-severity.medium { background: rgba(79,163,160,0.15); color: var(--medium); }
+    .case-severity.low { background: rgba(126,168,122,0.15); color: var(--low); }
+
+    .case-fields {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--muted);
+        padding: 10px 0 14px;
+        margin-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 20px;
+    }
+    .case-fields span {
+        margin-right: 20px;
+        display: inline-block;
+    }
+    .case-fields b { color: var(--text); font-weight: 500; margin-right: 4px; }
+
+    .case-body p {
+        margin: 0 0 14px;
+        font-size: 0.97rem;
+        color: var(--text);
+    }
+    .case-body .field-label {
+        font-family: 'Source Serif 4', serif;
+        font-weight: 600;
+        font-size: 0.82rem;
+        color: var(--muted);
+        margin-bottom: 3px;
+    }
+    .case-body .field-block { margin-bottom: 14px; }
+    .case-body .field-block:last-child { margin-bottom: 0; }
+
+    .empty {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--muted);
+    }
+    .empty .kicker {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
+        color: var(--signal);
+        margin-bottom: 10px;
+    }
+    .empty code {
+        font-family: 'JetBrains Mono', monospace;
+        background: var(--panel-raised);
+        padding: 2px 6px;
+        border-radius: 3px;
+        color: var(--text);
+    }
+
+    footer {
+        margin-top: 50px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+        color: var(--muted-dim);
+        font-size: 0.8rem;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    @media (max-width: 600px) {
+        .ledger { flex-wrap: wrap; }
+        .ledger-item { flex: 1 1 33%; border-bottom: 1px solid var(--line); }
+    }
+</style>
+</head>
+<body>
+<div class="shell">
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>

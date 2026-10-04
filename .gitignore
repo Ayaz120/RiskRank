@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.Python
+venv/
+.venv/
+env/
+
+# Project-generated data (never commit real scan/triage results)
+triage.db
+reports/triage_report.html
+
+# Editor/OS cruft
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Environment variables (if you ever add an .env file for API keys etc.)
+.env

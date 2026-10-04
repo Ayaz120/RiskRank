@@ -1,0 +1,26 @@
+[
+  {
+    "asset": "http://127.0.0.1:5000/login",
+    "title": "SQL Injection in login form",
+    "description": "The username field is concatenated directly into the SQL query string instead of using parameterized queries, allowing authentication bypass with a payload like ' OR '1'='1' -- ",
+    "asset_criticality": "high"
+  },
+  {
+    "asset": "http://127.0.0.1:5000/profile/<id>",
+    "title": "Insecure Direct Object Reference (IDOR) on profile endpoint",
+    "description": "Any authenticated user can view another user's profile by changing the numeric ID in the URL, with no ownership or authorization check on the server side.",
+    "asset_criticality": "medium"
+  },
+  {
+    "asset": "http://127.0.0.1:5000/dashboard",
+    "title": "Session tokens are predictable",
+    "description": "Session identifiers appear to increment predictably rather than being cryptographically random, potentially allowing session hijacking.",
+    "asset_criticality": "high"
+  },
+  {
+    "asset": "http://127.0.0.1:5000/static/css/style.css",
+    "title": "Verbose server banner disclosed",
+    "description": "The server response header discloses the exact Flask/Werkzeug version, which could help an attacker identify known vulnerabilities for that version.",
+    "asset_criticality": "low"
+  }
+]

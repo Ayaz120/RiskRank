@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Vulnerability Triage Dashboard{% endblock %}
+{% block content %}
+
+<header class="masthead">
+    <div class="kicker">vulnerability triage assistant</div>
+    <h1>Prioritized findings</h1>
+    <p class="lede">Findings ingested from scans and manual testing, assessed by a local AI model, and ranked by a weighted combination of severity, exploitability, and asset criticality.</p>
+</header>
+
+{% if stats.scored > 0 %}
+<div class="ledger">
+    <div class="ledger-item">
+        <div class="n">{{ stats.scored }}</div>
+        <div class="l">Ranked findings</div>
+    </div>
+    <div class="ledger-item critical">
+        <div class="n">{{ stats.critical }}</div>
+        <div class="l">Critical</div>
+    </div>
+    <div class="ledger-item high">
+        <div class="n">{{ stats.high }}</div>
+        <div class="l">High</div>
+    </div>
+    <div class="ledger-item medium">
+        <div class="n">{{ stats.medium }}</div>
+        <div class="l">Medium</div>
+    </div>
+    <div class="ledger-item low">
+        <div class="n">{{ stats.low }}</div>
+        <div class="l">Low</div>
+    </div>
+</div>
+
+<section class="stream">
+    {% for f in findings %}
+    <article class="case {{ f.severity_class }}">
+        <div class="case-top">
+            <span class="case-rank">#{{ f.priority_rank }}</span>
+            <h2 class="case-title">{{ f.title }}</h2>
+            <span class="case-severity {{ f.severity_class }}">{{ f.severity_label }} &middot; {{ f.ai_cvss_score }}</span>
+        </div>
+        <div class="case-fields">
+            <span><b>Asset</b> {{ f.asset }}</span>
+            <span><b>Source</b> {{ f.source }}</span>
+            <span><b>Exploitability</b> {{ f.ai_exploitability }}</span>
+            <span><b>Asset criticality</b> {{ f.asset_criticality }}</span>
+            <span><b>Priority</b> {{ f.priority_score }}/100</span>
+        </div>
+        <div class="case-body">
+            <div class="field-block">
+                <div class="field-label">Description</div>
+                <p>{{ f.description }}</p>
+            </div>
+            <div class="field-block">
+                <div class="field-label">Impact</div>
+                <p>{{ f.ai_explanation }}</p>
+            </div>
+            <div class="field-block">
+                <div class="field-label">CVSS reasoning</div>
+                <p>{{ f.ai_cvss_reasoning }}</p>
+            </div>
+            <div class="field-block">
+                <div class="field-label">Remediation</div>
+                <p>{{ f.ai_remediation }}</p>
+            </div>
+        </div>
+    </article>
+    {% endfor %}
+</section>
+
+<footer>generated locally &middot; {{ stats.pending }} finding(s) still pending triage</footer>
+
+{% else %}
+<div class="empty">
+    <div class="kicker">no ranked findings yet</div>
+    <p>Run the pipeline from the command line first:</p>
+    <p><code>python cli.py triage</code> then <code>python cli.py prioritize</code></p>
+</div>
+{% endif %}
+
+{% endblock %}
